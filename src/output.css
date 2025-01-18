@@ -770,6 +770,16 @@ input[type="range"]::-webkit-slider-thumb {
   accent-color: #dc2626;
 }
 
+@media (min-width: 1024px) {
+  .lg\:w-full {
+    width: 100%;
+  }
+
+  .lg\:max-w-full {
+    max-width: 100%;
+  }
+}
+
 .\[\&\>\*\]\:text-white>* {
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity, 1));
