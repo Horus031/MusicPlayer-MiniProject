@@ -594,6 +594,10 @@ input[type="range"]::-webkit-slider-thumb {
   margin-top: 408px;
 }
 
+.block {
+  display: block;
+}
+
 .flex {
   display: flex;
 }
@@ -764,4 +768,14 @@ input[type="range"]::-webkit-slider-thumb {
 
 .accent-red-600 {
   accent-color: #dc2626;
+}
+
+.\[\&\>\*\]\:text-white>* {
+  --tw-text-opacity: 1;
+  color: rgb(255 255 255 / var(--tw-text-opacity, 1));
+}
+
+.\[\&\>svg\]\:text-white>svg {
+  --tw-text-opacity: 1;
+  color: rgb(255 255 255 / var(--tw-text-opacity, 1));
 }

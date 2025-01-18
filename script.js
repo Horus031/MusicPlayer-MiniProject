@@ -9,6 +9,7 @@ const nextBtn = $('#btn-next');
 const prevBtn = $('#btn-prev');
 const shuffleBtn = $('#btn-shuffle svg');
 const repeatBtn = $('#btn-repeat svg');
+const songBlock = $('#playlist');
 
 // Objective
 /**
@@ -47,22 +48,40 @@ const app = {
             singer: 'Horus x Cun',
             path: './assets/music/audio3.mp3',
             image: './assets/img/img3.jpg',
+        },
+        {
+            name: 'Buồn hay vui remake',
+            singer: 'Horus ft. LilColG',
+            path: './assets/music/audio1.mp3',
+            image: './assets/img/img1.jpg',
+        },
+        {
+            name: 'Moments',
+            singer: 'Horus',
+            path: './assets/music/audio2.mp3',
+            image: './assets/img/img2.png',
+        },
+        {
+            name: '3107 remake',
+            singer: 'Horus x Cun',
+            path: './assets/music/audio3.mp3',
+            image: './assets/img/img3.jpg',
         }
     ],
     render: function() {
         const htmls = this.songs.map((song, index) => {
             return `
-                <div id="song" class= "${index === this.currentIndex ? 'bg-red-500' : 'bg-white'} flex justify-between items-center p-2 mt-2 rounded-md">
+                <div id="song-${index}" class="${index === this.currentIndex ? 'bg-red-500' : 'bg-white'} flex justify-between items-center p-2 mt-3 rounded-md">
                     <div class="flex items-center">
                         <img src="${song.image}" alt="" class="rounded-full h-12 mr-6">
-                        <div>
-                            <h1 class="${index === this.currentIndex ? 'text-white' : ''} font-bold text-lg">${song.name}</h1>
-                            <h2 class="${index === this.currentIndex ? 'text-white' : 'text-gray-400'}">${song.singer}</h2>
+                        <div id="song__title-${index}" class="${index === this.currentIndex ? '[&>*]:text-white' : ''}">
+                            <h1 class="font-bold text-lg">${song.name}</h1>
+                            <h2 class="text-gray-400">${song.singer}</h2>
                         </div>
                     </div>
 
-                    <div>
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" fill="currentColor" class="size-5 ${index === this.currentIndex ? 'text-white' : ''}">
+                    <div class="song__feature ${index === this.currentIndex ? '[&>*]:text-white' : ''}">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" fill="currentColor" class="size-5">
                             <!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.-->
                             <path d="M8 256a56 56 0 1 1 112 0A56 56 0 1 1 8 256zm160 0a56 56 0 1 1 112 0 56 56 0 1 1 -112 0zm216-56a56 56 0 1 1 0 112 56 56 0 1 1 0-112z"/>
                         </svg>
@@ -86,6 +105,7 @@ const app = {
         const _this = this;
         const cdHeight = cd.offsetHeight;
         const toggleBtn = $$('#btn-toggle-play svg');
+        
         const handleToggleBtn = function() {
             if(toggleBtn[1].classList.contains('hidden')) {
                 toggleBtn.forEach(button => {
@@ -94,6 +114,7 @@ const app = {
                 toggleBtn[0].classList.add('hidden');
             }
         }
+
 
         // Xử lý cd rotate và stop rotate
         const cdAnimate = cd.animate([
@@ -150,29 +171,6 @@ const app = {
             audio.currentTime = seekingTime;
         }
 
-        // Chuyển bài hát
-        nextBtn.onclick = function() {
-            if (_this.isShuffle) {
-                _this.shuffleSong();
-            } else {
-                _this.nextSong();
-            }
-            handleToggleBtn();
-            audio.play();
-            _this.render();
-        }
-
-        prevBtn.onclick = function() {
-            if (_this.isShuffle) {
-                _this.shuffleSong();
-            } else {
-                _this.prevSong();
-            }
-            handleToggleBtn();
-            audio.play();
-            _this.render();
-        }
-
         // Bật ngẫu nhiên bài hát
         shuffleBtn.onclick = function() {
             _this.isShuffle = !_this.isShuffle;
@@ -193,14 +191,94 @@ const app = {
             _this.isRepeated = !_this.isRepeated;
             repeatBtn.classList.toggle('text-red-500', _this.isRepeated);
         }
+
+        // Click để chọn bài hát bất kỳ
+        document.addEventListener("DOMContentLoaded", () => {
+            const songs = Array.from(songBlock.children);
+            // Khởi tạo các biến để lưu các phần tử
+            let activeSong = $(`#song-${_this.currentIndex}`);
+            let songElems = Array.from(activeSong.children);
+            let songTitle = $(`#song__title-${_this.currentIndex}`);
+            let songFeature = songElems[1];
+
+            function updateActiveSong() {
+                // Xóa class từ bài hát active trước
+                activeSong.classList.remove('bg-red-500');
+                activeSong.classList.add('bg-white');
+                songTitle.classList.remove('[&>*]:text-white');
+                songFeature.classList.remove('[&>*]:text-white');
         
+                // Cập nhật phần tử của bài hát hiện tại
+                activeSong = $(`#song-${_this.currentIndex}`);
+                songElems = Array.from(activeSong.children);
+                songTitle = $(`#song__title-${_this.currentIndex}`);
+                songFeature = songElems[1];
+        
+                // Thêm các class vào bài hát đang active
+                activeSong.classList.remove('bg-white');
+                activeSong.classList.add('bg-red-500');
+                songTitle.classList.add('[&>*]:text-white');
+                songFeature.classList.add('[&>*]:text-white');
+            }
+        
+            // Gọi hàm để tiến hành xử lý các phần tử
+            updateActiveSong(); 
+
+            songs.forEach((song, index) => {
+                song.onclick = function(e) {
+                    if (index !== _this.currentIndex && !e.target.closest('.song__feature')) {
+                        handleToggleBtn();
+                        _this.currentIndex = index;
+                        updateActiveSong();
+                        _this.loadCurrentSong();
+                        audio.play();
+                    }
+                };
+            });
+
+            // Chuyển bài hát
+            nextBtn.onclick = function() {
+                if (_this.isShuffle) {
+                    _this.shuffleSong();
+                } else {
+                    _this.nextSong();
+                }
+                handleToggleBtn();
+                updateActiveSong();
+                audio.play();
+                _this.scrollToActiveSong();
+            }
+
+            prevBtn.onclick = function() {
+                if (_this.isShuffle) {
+                    _this.shuffleSong();
+                } else {
+                    _this.prevSong();
+                }
+                handleToggleBtn();
+                updateActiveSong();
+                audio.play();
+                _this.scrollToActiveSong();
+            }
+        });  
     },
+    scrollToActiveSong: function() {
+        setTimeout(() => {
+            const currentActiveSong = $(`#song-${this.currentIndex}`);
+            currentActiveSong.scrollIntoView({
+                behavior: 'smooth',
+                block: 'nearest',
+            })
+        }, 500)
+    },
+
     loadCurrentSong: function() {
         heading.textContent = this.currentSong.name;
         cd.src = this.currentSong.image;
         audio.src = this.currentSong.path;
 
     },
+
     nextSong: function() {
         this.currentIndex++;
         if (this.currentIndex >= this.songs.length) {
@@ -226,11 +304,7 @@ const app = {
         this.currentIndex = newIndex;
         this.loadCurrentSong();
     },
-
-    repeatSong: function() {
-        
-    },
-
+    
     start: function() {
         // Dinh nghia cac thuoc tinh cho Object
         this.defineProperties();
