@@ -1,5 +1,8 @@
 const $ = document.querySelector.bind(document);
 const $$ = document.querySelectorAll.bind(document);
+
+const PLAYER_STORAGE_KEY = 'PLAYER';
+
 const heading = $('header h1');
 const cd = $('#cd');
 const audio = $('#audio');
@@ -30,6 +33,7 @@ const app = {
     isPlaying: false,
     isShuffle: false,
     isRepeated: false,
+    config: JSON.parse(localStorage.getItem(PLAYER_STORAGE_KEY)) || {},
     songs: [
         {
             name: 'Buồn hay vui remake',
@@ -68,6 +72,10 @@ const app = {
             image: './assets/img/img3.jpg',
         }
     ],
+    setConfig: function(key, value) {
+        this.config[key] = value;
+        localStorage.setItem(PLAYER_STORAGE_KEY, JSON.stringify(this.config));
+    },
     render: function() {
         const htmls = this.songs.map((song, index) => {
             return `
@@ -174,6 +182,7 @@ const app = {
         // Bật ngẫu nhiên bài hát
         shuffleBtn.onclick = function() {
             _this.isShuffle = !_this.isShuffle;
+            _this.setConfig('isShuffle', _this.isShuffle);
             shuffleBtn.classList.toggle('text-red-500', _this.isShuffle);
         }
 
@@ -189,6 +198,7 @@ const app = {
         // Lặp lại bài hát
         repeatBtn.onclick = function() {
             _this.isRepeated = !_this.isRepeated;
+            _this.setConfig('isRepeated', _this.isRepeated);
             repeatBtn.classList.toggle('text-red-500', _this.isRepeated);
         }
 
@@ -226,12 +236,20 @@ const app = {
 
             songs.forEach((song, index) => {
                 song.onclick = function(e) {
-                    if (index !== _this.currentIndex && !e.target.closest('.song__feature')) {
-                        handleToggleBtn();
-                        _this.currentIndex = index;
-                        updateActiveSong();
-                        _this.loadCurrentSong();
-                        audio.play();
+                    if (index !== _this.currentIndex || e.target.closest('song__feature')) {
+                        // Xử lý khi click vào song
+                        if (index !== _this.currentIndex) {
+                            handleToggleBtn();
+                            _this.currentIndex = index;
+                            updateActiveSong();
+                            _this.loadCurrentSong();
+                            audio.play();
+                        }
+
+                        // Xử lý khi click vào ba chấm
+                        if (e.target.closest('song__feature')) {
+                            console.log(e.target);
+                        }
                     }
                 };
             });
@@ -279,6 +297,11 @@ const app = {
 
     },
 
+    loadConfig: function() {
+        this.isShuffle = this.config.isShuffle;
+        this.isRepeated = this.config.isRepeated;
+    },
+
     nextSong: function() {
         this.currentIndex++;
         if (this.currentIndex >= this.songs.length) {
@@ -306,8 +329,12 @@ const app = {
     },
     
     start: function() {
+        // Gán cấu hình từ config vào ứng dụng
+        this.loadConfig();
+
         // Dinh nghia cac thuoc tinh cho Object
         this.defineProperties();
+
         // Lang nghe, xu li cac su kien
         this.handleEvents();
 
@@ -316,6 +343,10 @@ const app = {
 
         // Render playlist
         this.render();
+
+        // Hiển thị trạng thái ban đầu của button shuffle và repeat
+        shuffleBtn.classList.toggle('text-red-500', this.isShuffle);
+        repeatBtn.classList.toggle('text-red-500', this.isRepeated);
     }
 }
 

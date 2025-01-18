@@ -628,8 +628,8 @@ input[type="range"]::-webkit-slider-thumb {
   height: 13rem;
 }
 
-.h-screen {
-  height: 100vh;
+.h-full {
+  height: 100%;
 }
 
 .w-full {
@@ -771,11 +771,6 @@ input[type="range"]::-webkit-slider-thumb {
 }
 
 .\[\&\>\*\]\:text-white>* {
-  --tw-text-opacity: 1;
-  color: rgb(255 255 255 / var(--tw-text-opacity, 1));
-}
-
-.\[\&\>svg\]\:text-white>svg {
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity, 1));
 }
