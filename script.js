@@ -199,6 +199,9 @@ const app = {
         audio.onended = function() {
             if (_this.isRepeated) {
                 audio.play();
+            } else if (_this.isShuffle) {
+                _this.shuffleSong();
+                audio.play();
             } else {
                 nextBtn.click();
             }
@@ -334,10 +337,12 @@ const app = {
 
         // Render playlist
         this.render();
+
+        window.addEventListener("resize", () => {
+            location.reload();
+        });
     }
 }
 
 app.start();
-window.addEventListener("resize", () => {
-    location.reload();
-});
+
